@@ -51,10 +51,10 @@ VERBOSE = 2
 RESOLUTION = -1.0 #relying on input file
 
 if args.resolution:
-    RESOLUTION = args.resolution
+    RESOLUTION = float(args.resolution)
 
 if args.verbose>0:
-    VERBOSE=args.verbose
+    VERBOSE=int(args.verbose)
 
 DUMP_FILE=open("grid_log.txt","a")
 

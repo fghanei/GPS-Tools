@@ -46,8 +46,10 @@ ROUND_FLAG = True # round angles to 0, 45, 90, 135 by default. -> overriden by -
 VERBOSE = 2
 RESOLUTION = 10.0 #by default
 LAMBDA = 1
-GAMMA = 1
+GAMMA = -1
+TURN_COST = [0.0, 0.09592376, 0.90877848, 2.50663892] #non linear for each turn, in case GAMMA is not given
 GRAPH_NAME="path"
+SUFFIX=""
 
 if args.exact:
     ROUND_FLAG = False
@@ -63,6 +65,11 @@ if args.lambda_param>0:
 
 if args.gamma_param>0:
     GAMMA = float(args.gamma_param)
+
+if GAMMA > 0:
+    TURN_COST = [0 * GAMMA, 45.0 * GAMMA, 90.0 * GAMMA, 135.0 * GAMMA]
+else:
+    print "gamma is not set, using the table for 45, 90, and 135 degrees"
 
 if args.suffix:
     SUFFIX = "_"+args.suffix
@@ -211,10 +218,13 @@ for i in range(2, len(wp_command)):
 # calculating todal distance and pring results
 total_distance = 0
 total_turn = 0
+total_turn_cost = 0
 dump(DUMP.DEBUG, "ID \t  CMD \t   LAT   \t   LON   \t   Step  \t Total  \t Turn \t Total")
 for i in range(len(wp_command)):
     total_distance += distance_step[i]
     total_turn += turn_step[i]
+    total_turn_cost += TURN_COST[turn_step[i]/45]
+
     dump(DUMP.DEBUG, "{0:3d}\t{1:5d}\t{2:9.6f}\t{3:9.6f}\t{4:8.1f}\t{5:8.1f}\t{6:6d}\t{7:7d}".format(
             i, wp_command[i], wp_latitude[i], wp_longitude[i], distance_step[i], total_distance, turn_step[i],total_turn))
 
@@ -224,8 +234,8 @@ dump(DUMP.INFO, "For input file: "+args.wp_file)
 dump(DUMP.INFO, "Total Distance: %.1f | Total Turn: %.1f | Number of 45' Turn: %d | Number of 90' Turn: %d | Number of 135' Turn: %d | Number of 180' Turn: %d"%
                     (total_distance,  total_turn, turn_step.count(45), turn_step.count(90), turn_step.count(135), turn_step.count(180)))
 dump(DUMP.INFO, "Distance Cost (lambda=%.4f): %.3f"%(LAMBDA, total_distance * LAMBDA))
-dump(DUMP.INFO, "Turn Cost (gamma=%.4f):      %.3f"%(GAMMA,  total_turn * GAMMA))
-dump(DUMP.INFO, "Total Cost:                  %.3f"%(total_distance * LAMBDA + total_turn * GAMMA))
+dump(DUMP.INFO, "Turn Cost (gamma, gamma_45, gamma_90, gamma_135 =%.4f %.4f %.4f %.4f):      %.3f"%(GAMMA, TURN_COST[1], TURN_COST[2], TURN_COST[3],  total_turn_cost))
+dump(DUMP.INFO, "Total Cost:                  %.3f"%(total_distance * LAMBDA + total_turn_cost))
 dump(DUMP.INFO, "****************************************")
 
 
