@@ -20,6 +20,8 @@ python path_graph.py mission_cplex_0.txt -a $LAMBDA -m $GAMMA -g -x cplex
 python path_graph.py mission_lkhd_0.txt -a $LAMBDA -m $GAMMA -g -x lkhd
 ./ub-anc-planner-dls -r $RES -a $LAMBDA -m $GAMMA -l 3600 > planner_log_dls.txt 
 python path_graph.py mission_dls_0.txt -a $LAMBDA -m $GAMMA -g -x dls
+./ub-anc-planner-lkh -r $RES -a $LAMBDA -m $GAMMA -l 3600 > planner_log_lkh.txt 
+python path_graph.py mission_lkh_0.txt -a $LAMBDA -m $GAMMA -g -x lkh
 set -e
 mkdir new_data 
 mv grid.png grid.txt grid_log.txt mission_* path_*.png planner_log_* path_*.txt new_data/ 
